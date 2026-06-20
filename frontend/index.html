@@ -329,6 +329,76 @@
   .tally-item.crimson .tally-num { color: var(--crimson-soft); }
   .tally-label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; font-weight: 600; }
 
+  /* About toggle */
+  .about-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-faint);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .about-toggle:hover { color: var(--text-dim); }
+  .about-toggle .chev { transition: transform 0.2s ease; font-size: 10px; }
+  .about-toggle.open .chev { transform: rotate(90deg); }
+
+  .about-box {
+    display: none;
+    margin-top: 14px;
+    padding: 18px 20px;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    max-width: 560px;
+  }
+  .about-box.open { display: block; }
+  .about-box p {
+    font-size: 13.5px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .about-box p:last-child { margin-bottom: 0; }
+  .about-box strong { color: var(--text); }
+
+  .sidebar-footer {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .sidebar-footer .built-by {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .social-links { display: flex; flex-direction: column; gap: 8px; }
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+  .social-link:hover {
+    border-color: var(--blue);
+    color: var(--text);
+    background: var(--blue-dim);
+  }
+  .social-link svg { width: 16px; height: 16px; flex-shrink: 0; }
   @media (max-width: 800px) {
     .layout { grid-template-columns: 1fr; }
     .main { padding: 36px 22px; border-right: none; border-bottom: 1px solid var(--line); }
@@ -345,6 +415,14 @@
       <div class="eyebrow">Live Cross-Examination</div>
       <h1>Debate Partner</h1>
       <div class="sub">State a position. An opponent built to find its weakest point will attack — round by round, claim by claim.</div>
+      <button class="about-toggle" id="aboutToggle" onclick="toggleAbout()">
+        <span class="chev">▶</span> About this project
+      </button>
+      <div class="about-box" id="aboutBox">
+        <p><strong>What this is:</strong> most AI chat tools are agreeable by default. This one is built specifically to find holes in your thinking - attacking one claim at a time, tracking what you've defended or lost, and adapting its strategy round by round like a real debate opponent would.</p>
+        <p><strong>How it works:</strong> each response from the AI carries both a natural-language rebuttal and structured data about the debate's state, generated in a single model call. That structured data drives the live scoreboard you see on the right.</p>
+        <p><strong>Stack:</strong> Python, Flask, and the Groq API (Llama 3.3 70B) on the backend; vanilla JavaScript on the frontend - no frameworks.</p>
+      </div>
     </div>
 
     <div class="opening-form" id="openingForm">
@@ -368,6 +446,20 @@
     <div class="tally" id="tally" style="display:none;">
       <div class="tally-item blue"><div class="tally-num" id="tallyDefended">0</div><div class="tally-label">Defended</div></div>
       <div class="tally-item crimson"><div class="tally-num" id="tallyDefeated">0</div><div class="tally-label">Defeated</div></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="built-by">Built by Ayush Vardhan Singh</div>
+      <div class="social-links">
+        <a class="social-link" href="https://www.linkedin.com/in/ayush-vardhan-singh/" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+          LinkedIn
+        </a>
+        <a class="social-link" href="https://github.com/AyushVardhanOG" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.04-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.49 5.92.43.37.81 1.1.81 2.22 0 1.6-.01 2.89-.01 3.29 0 .32.22.69.83.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -544,6 +636,13 @@ function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
+}
+
+function toggleAbout() {
+  const box = document.getElementById("aboutBox");
+  const btn = document.getElementById("aboutToggle");
+  box.classList.toggle("open");
+  btn.classList.toggle("open");
 }
 </script>
 </body>
