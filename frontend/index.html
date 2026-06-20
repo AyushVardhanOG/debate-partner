@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debate Partner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0D0E14;
+    --bg-raised: #15161F;
+    --bg-input: #1B1C28;
+    --line: #2A2C3D;
+
+    --text: #F2F1EC;
+    --text-dim: #8E8FA3;
+    --text-faint: #565870;
+
+    --crimson: #FF3B3B;
+    --crimson-soft: #FF6B6B;
+    --crimson-dim: #401A1F;
+    --crimson-glow: rgba(255, 59, 59, 0.25);
+
+    --blue: #3B9EFF;
+    --blue-soft: #6BB8FF;
+    --blue-dim: #16263D;
+    --blue-glow: rgba(59, 158, 255, 0.25);
+
+    --amber: #FFB23B;
+    --amber-dim: #3D2E14;
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-sans: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(circle at 15% 0%, rgba(255,59,59,0.06), transparent 40%),
+                       radial-gradient(circle at 85% 100%, rgba(59,158,255,0.06), transparent 40%);
+    color: var(--text);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    min-height: 100vh;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .main {
+    padding: 52px 60px;
+    border-right: 1px solid var(--line);
+  }
+
+  .masthead { margin-bottom: 40px; }
+  .masthead .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--crimson-soft);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .masthead .eyebrow::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--crimson);
+    box-shadow: 0 0 8px var(--crimson-glow);
+  }
+  .masthead h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 46px;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    background: linear-gradient(120deg, #FFFFFF 30%, var(--blue-soft) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .masthead .sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 10px;
+    max-width: 480px;
+  }
+
+  .opening-form { padding: 8px 0; }
+  .opening-form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .opening-form textarea {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 18px;
+    padding: 18px;
+    min-height: 100px;
+    resize: vertical;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .opening-form textarea:focus {
+    outline: none;
+    border-color: var(--crimson);
+    box-shadow: 0 0 0 4px var(--crimson-glow);
+  }
+
+  .btn-primary {
+    margin-top: 18px;
+    background: linear-gradient(135deg, var(--crimson) 0%, #E0264F 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 32px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 20px var(--crimson-glow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px var(--crimson-glow); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { background: var(--text-faint); cursor: not-allowed; box-shadow: none; transform: none; }
+
+  .transcript { display: none; }
+  .transcript.active { display: block; }
+
+  .entry {
+    margin-bottom: 24px;
+    padding: 20px 22px;
+    border-radius: 12px;
+    animation: slideIn 0.35s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .entry.opponent { background: var(--crimson-dim); border: 1px solid rgba(255,59,59,0.25); }
+  .entry.human { background: var(--blue-dim); border: 1px solid rgba(59,158,255,0.25); }
+
+  .entry-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .entry-label.opponent { color: var(--crimson-soft); }
+  .entry-label.human { color: var(--blue-soft); }
+  .entry-label .round-tag { color: var(--text-faint); font-weight: 600; letter-spacing: 0.02em; text-transform: none; }
+
+  .entry-text {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.55;
+    color: var(--text);
+  }
+
+  .claim-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--crimson-soft);
+    background: rgba(255,59,59,0.1);
+    border: 1px solid rgba(255,59,59,0.3);
+    border-radius: 20px;
+    padding: 5px 12px;
+  }
+  .claim-tag::before { content: '⚔'; font-size: 11px; }
+
+  .response-form { margin-top: 4px; }
+  .response-form textarea {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1.5px solid var(--blue-dim);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 16px;
+    padding: 16px;
+    min-height: 80px;
+    resize: vertical;
+  }
+  .response-form textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px var(--blue-glow);
+  }
+  .btn-secondary {
+    margin-top: 14px;
+    background: linear-gradient(135deg, var(--blue) 0%, #2670CC 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 28px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 20px var(--blue-glow);
+    transition: transform 0.15s ease;
+  }
+  .btn-secondary:hover { transform: translateY(-1px); }
+  .btn-secondary:disabled { background: var(--text-faint); cursor: not-allowed; box-shadow: none; transform: none; }
+
+  .error-line {
+    font-size: 13px;
+    color: var(--crimson-soft);
+    background: var(--crimson-dim);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 12px;
+    border: 1px solid rgba(255,59,59,0.3);
+  }
+
+  .verdict-box {
+    margin-top: 8px;
+    padding: 28px;
+    background: linear-gradient(135deg, var(--bg-raised) 0%, #1A1B2E 100%);
+    border: 1.5px solid var(--amber-dim);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .verdict-box::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--crimson), var(--amber), var(--blue));
+  }
+  .verdict-label { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); margin-bottom: 14px; }
+  .verdict-text { font-family: var(--font-display); font-size: 17px; font-weight: 500; line-height: 1.6; }
+
+  .restart-btn {
+    margin-top: 22px;
+    background: transparent;
+    border: 1.5px solid var(--line);
+    color: var(--text-dim);
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .restart-btn:hover { border-color: var(--text); color: var(--text); }
+
+  .sidebar { padding: 52px 30px; background: var(--bg-raised); }
+  .sidebar-header { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; }
+  .round-counter { font-family: var(--font-display); font-weight: 700; font-size: 28px; margin-bottom: 28px; }
+  .round-counter .of { font-size: 16px; color: var(--text-faint); font-weight: 500; }
+
+  .progress-track { height: 6px; background: var(--line); border-radius: 4px; margin-bottom: 28px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--crimson), var(--blue)); border-radius: 4px; transition: width 0.4s ease; }
+
+  .docket-empty { font-family: var(--font-display); font-style: italic; color: var(--text-faint); font-size: 14px; }
+
+  .claim-card {
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+  .claim-card.just-updated { animation: flash 0.6s ease; }
+  @keyframes flash { 0% { background: rgba(255,255,255,0.15); } 100% { background: transparent; } }
+
+  .claim-card .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .claim-card.defended { border-color: rgba(59,158,255,0.4); background: rgba(59,158,255,0.04); }
+  .claim-card.defended .badge { background: var(--blue-dim); color: var(--blue-soft); }
+  .claim-card.defeated { border-color: rgba(255,59,59,0.4); background: rgba(255,59,59,0.04); }
+  .claim-card.defeated .badge { background: var(--crimson-dim); color: var(--crimson-soft); }
+  .claim-card.contested { border-color: rgba(255,178,59,0.4); }
+  .claim-card.contested .badge { background: var(--amber-dim); color: var(--amber); }
+  .claim-card.attacking { border-color: var(--text-faint); border-style: dashed; }
+  .claim-card.attacking .badge {
+    background: transparent; color: var(--text-dim); border: 1px solid var(--text-faint);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  .claim-card .claim-text { font-family: var(--font-display); font-size: 13.5px; line-height: 1.45; color: var(--text-dim); }
+
+  .tally { display: flex; gap: 14px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .tally-item { text-align: center; flex: 1; padding: 14px 8px; border-radius: 10px; }
+  .tally-item.blue { background: var(--blue-dim); }
+  .tally-item.crimson { background: var(--crimson-dim); }
+  .tally-num { font-family: var(--font-display); font-weight: 800; font-size: 26px; }
+  .tally-item.blue .tally-num { color: var(--blue-soft); }
+  .tally-item.crimson .tally-num { color: var(--crimson-soft); }
+  .tally-label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; font-weight: 600; }
+
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    .main { padding: 36px 22px; border-right: none; border-bottom: 1px solid var(--line); }
+    .sidebar { padding: 36px 22px; }
+    .masthead h1 { font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <div class="main">
+    <div class="masthead">
+      <div class="eyebrow">Live Cross-Examination</div>
+      <h1>Debate Partner</h1>
+      <div class="sub">State a position. An opponent built to find its weakest point will attack — round by round, claim by claim.</div>
+    </div>
+
+    <div class="opening-form" id="openingForm">
+      <label>What position will you defend today?</label>
+      <textarea id="positionInput" placeholder="e.g. Remote work is better than office work for software teams."></textarea>
+      <br>
+      <button class="btn-primary" id="startBtn" onclick="startDebate()">Enter the arena</button>
+      <div id="openingError"></div>
+    </div>
+
+    <div class="transcript" id="transcript"></div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-header">Scoreboard</div>
+    <div class="round-counter" id="roundCounter">—</div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div id="claimsContainer">
+      <div class="docket-empty">No claims under examination yet.</div>
+    </div>
+    <div class="tally" id="tally" style="display:none;">
+      <div class="tally-item blue"><div class="tally-num" id="tallyDefended">0</div><div class="tally-label">Defended</div></div>
+      <div class="tally-item crimson"><div class="tally-num" id="tallyDefeated">0</div><div class="tally-label">Defeated</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "http://localhost:5000/api";
+let sessionId = null;
+let currentPosition = "";
+
+async function startDebate() {
+  const position = document.getElementById("positionInput").value.trim();
+  const errorBox = document.getElementById("openingError");
+  errorBox.innerHTML = "";
+
+  if (!position) {
+    errorBox.innerHTML = `<div class="error-line">State a position before entering the arena.</div>`;
+    return;
+  }
+
+  currentPosition = position;
+  const btn = document.getElementById("startBtn");
+  btn.disabled = true;
+  btn.textContent = "Entering the arena...";
+
+  try {
+    const res = await fetch(`${API_BASE}/start`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({position})
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      errorBox.innerHTML = `<div class="error-line">${data.error}</div>`;
+      btn.disabled = false;
+      btn.textContent = "Enter the arena";
+      return;
+    }
+
+    sessionId = data.session_id;
+    document.getElementById("openingForm").style.display = "none";
+
+    const transcript = document.getElementById("transcript");
+    transcript.classList.add("active");
+    transcript.innerHTML = `
+      <div class="entry human">
+        <div class="entry-label human">Your opening position</div>
+        <div class="entry-text">${escapeHtml(currentPosition)}</div>
+      </div>
+    `;
+
+    appendOpponentEntry(data.rebuttal, data.claim, data.round, data.max_rounds);
+    updateScorecard(data.scorecard, data.round, data.max_rounds);
+    renderResponseForm();
+
+  } catch (err) {
+    errorBox.innerHTML = `<div class="error-line">Could not reach the debate server. Is the backend running? (${err.message})</div>`;
+    btn.disabled = false;
+    btn.textContent = "Enter the arena";
+  }
+}
+
+async function submitResponse() {
+  const input = document.getElementById("humanResponseInput");
+  const response = input.value.trim();
+  if (!response) return;
+
+  const btn = document.getElementById("submitResponseBtn");
+  btn.disabled = true;
+  btn.textContent = "Opponent is considering...";
+
+  const transcript = document.getElementById("transcript");
+  transcript.innerHTML += `
+    <div class="entry human">
+      <div class="entry-label human">Your response</div>
+      <div class="entry-text">${escapeHtml(response)}</div>
+    </div>
+  `;
+  document.getElementById("responseFormContainer").remove();
+
+  try {
+    const res = await fetch(`${API_BASE}/respond`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({session_id: sessionId, response})
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      transcript.innerHTML += `<div class="error-line">${data.error}</div>`;
+      return;
+    }
+
+    if (data.debate_over) {
+      appendOpponentEntry(data.rebuttal, null, data.round, data.max_rounds);
+      updateScorecard(data.scorecard, data.round, data.max_rounds);
+      renderVerdict(data.final_verdict, data.status_counts);
+    } else {
+      appendOpponentEntry(data.rebuttal, data.claim, data.round, data.max_rounds);
+      updateScorecard(data.scorecard, data.round, data.max_rounds);
+      renderResponseForm();
+    }
+
+  } catch (err) {
+    transcript.innerHTML += `<div class="error-line">Connection error: ${err.message}</div>`;
+  }
+}
+
+function appendOpponentEntry(rebuttal, claim, round, maxRounds) {
+  const transcript = document.getElementById("transcript");
+  const claimTag = claim ? `<div class="claim-tag">Attacking: ${escapeHtml(claim.claim_text || "")}</div>` : "";
+  transcript.innerHTML += `
+    <div class="entry opponent">
+      <div class="entry-label opponent">Opponent <span class="round-tag">— round ${round} of ${maxRounds}</span></div>
+      <div class="entry-text">${escapeHtml(rebuttal)}</div>
+      ${claimTag}
+    </div>
+  `;
+  window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"});
+}
+
+function renderResponseForm() {
+  const transcript = document.getElementById("transcript");
+  const div = document.createElement("div");
+  div.id = "responseFormContainer";
+  div.className = "response-form";
+  div.innerHTML = `
+    <textarea id="humanResponseInput" placeholder="Defend your position..."></textarea>
+    <br>
+    <button class="btn-secondary" id="submitResponseBtn" onclick="submitResponse()">Submit response</button>
+  `;
+  transcript.appendChild(div);
+  document.getElementById("humanResponseInput").focus();
+}
+
+function renderVerdict(verdictText, statusCounts) {
+  const transcript = document.getElementById("transcript");
+  transcript.innerHTML += `
+    <div class="verdict-box">
+      <div class="verdict-label">Final Verdict</div>
+      <div class="verdict-text">${escapeHtml(verdictText)}</div>
+    </div>
+    <button class="restart-btn" onclick="location.reload()">Start a new debate</button>
+  `;
+
+  document.getElementById("tally").style.display = "flex";
+  document.getElementById("tallyDefended").textContent = statusCounts.defended || 0;
+  document.getElementById("tallyDefeated").textContent = statusCounts.defeated || 0;
+
+  window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"});
+}
+
+function updateScorecard(claims, round, maxRounds) {
+  document.getElementById("roundCounter").innerHTML = `Round ${round} <span class="of">/ ${maxRounds}</span>`;
+  document.getElementById("progressFill").style.width = `${Math.min(100, (round / maxRounds) * 100)}%`;
+
+  const container = document.getElementById("claimsContainer");
+  if (!claims || claims.length === 0) {
+    container.innerHTML = `<div class="docket-empty">No claims under examination yet.</div>`;
+    return;
+  }
+
+  const badgeText = {defended: "✓ Defended", defeated: "✕ Defeated", contested: "? Contested", attacking: "● Live"};
+
+  container.innerHTML = claims.map(c => `
+    <div class="claim-card ${c.status} just-updated">
+      <div class="badge">${badgeText[c.status] || c.status}</div>
+      <div class="claim-text">${escapeHtml(c.claim_text || "")}</div>
+    </div>
+  `).join("");
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
